@@ -225,7 +225,8 @@ QSocketNotifier *signalSn;
 static void signalHandler(int)
 {
     char a = 1;
-    (void)write(signalFd[0], &a, sizeof(a));
+    ssize_t ret = write(signalFd[0], &a, sizeof(a));
+    (void)ret;
 }
 #endif
 
