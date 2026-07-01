@@ -320,7 +320,7 @@ qint64 AudioSourceFlac::readData(char* data, qint64 maxSize) {
 
     while (totalBytesRead < maxSize) {
         if (m_currentSample >= m_loopEndSample) {
-            printf("Looping back to sample:%d (from:%d)\n", m_loopStartSample, m_currentSample);
+            printf("Looping back to sample:%lld (from:%lld)\n", m_loopStartSample, m_currentSample);
             m_loopsPlayed++;
 
             if (!seekInternal(m_loopStartSample)) {

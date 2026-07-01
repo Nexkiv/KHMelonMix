@@ -686,6 +686,25 @@ void DSi_NWifi::SendCMD(MMCCommand cmd, u32 param)
             }
         }
         return;
+
+    case MMCCommand::Reset:
+    case MMCCommand::GetOCR:
+    case MMCCommand::AllGetCID:
+    case MMCCommand::GetRCA:
+    case MMCCommand::Switch:
+    case MMCCommand::Select:
+    case MMCCommand::SetVoltage:
+    case MMCCommand::GetCSD:
+    case MMCCommand::GetCID:
+    case MMCCommand::GetCSR:
+    case MMCCommand::SetBlockLength:
+    case MMCCommand::ReadSingleBlock:
+    case MMCCommand::ReadMultipleBlocks:
+    case MMCCommand::WriteSingleBlock:
+    case MMCCommand::WriteMultipleBlocks:
+    case MMCCommand::AppCommand:
+    case MMCCommand::DataBlock:
+        break;
     }
 
     Log(LogLevel::Warn, "NWIFI: unknown CMD %d %08X\n", cmd, param);

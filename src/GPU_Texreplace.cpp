@@ -4,7 +4,10 @@
 #include "stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include "stb_image_write.h"
+#pragma clang diagnostic pop
 
 namespace Texreplace
 {
@@ -73,7 +76,7 @@ void ExportTextureAsFile(unsigned char* data, const char* path, u32 width, u32 h
             r = (r << 2);
             g = (g << 2);
             b = (b << 2);
-            alpha = (alpha + 1 << 3) - 1;
+            alpha = ((alpha + 1) << 3) - 1;
             if (alpha <= 0x7) alpha = 0;
             newPixel[0] = r;
             newPixel[1] = g;

@@ -2266,7 +2266,7 @@ bool PluginKingdomHeartsDays::isTargetVisibleOnBottomScreen()
     return !onlyGrayscale;
 }
 
-#undef DIFF(val1, val2)
+#undef DIFF
 
 bool PluginKingdomHeartsDays::isCutsceneFromChallengeMissionVisible()
 {

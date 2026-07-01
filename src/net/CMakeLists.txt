@@ -23,6 +23,9 @@ if (USE_SYSTEM_LIBSLIRP)
 else()
     add_subdirectory(libslirp EXCLUDE_FROM_ALL)
     target_link_libraries(net-utils PUBLIC slirp)
+    # libslirp is vendored third-party code; melonDS hasn't resolved these deprecated-POSIX-name
+    # warnings upstream either (Windows-only), so suppress rather than hand-patch vendored files.
+    target_compile_options(slirp PRIVATE -Wno-deprecated-declarations)
 endif()
 
 if (USE_VCPKG)

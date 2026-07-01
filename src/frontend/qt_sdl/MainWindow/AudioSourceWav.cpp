@@ -92,7 +92,7 @@ qint64 AudioSourceWav::readData(char *data, qint64 maxSize) {
             return bytesRead;
         }
 
-        printf("Loop bgm to start sample: %d\n", m_loopStartByte);
+        printf("Loop bgm to start sample: %lld\n", m_loopStartByte);
         m_loopsPlayed++;
 
         m_file.seek(m_loopStartByte);

@@ -25,7 +25,7 @@ static std::vector<u32> luaGameCodes;
 void addGameCode(u32 gameCode)
 {
     luaGameCodes.push_back(gameCode);
-    printf("Codes Size:%i\n",luaGameCodes.size());
+    printf("Codes Size:%zu\n",luaGameCodes.size());
 }
 
 void clearGameCodes()

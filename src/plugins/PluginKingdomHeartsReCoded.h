@@ -26,7 +26,7 @@ public:
     int cutsceneMenuLanguage() override;
 
     void loadLocalization();
-    std::string saveFilePath();
+    std::string saveFilePath() override;
     StartupWindowConfig startupWindowConfig() override;
     void onLoadROM() override;
 

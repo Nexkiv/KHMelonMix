@@ -999,6 +999,11 @@ void DSi_MMCStorage::SendCMD(MMCCommand cmd, u32 param)
         CSR |= (1<<5);
         Host->SendResponse(CSR, true);
         return;
+
+    case MMCCommand::IORWDirect:
+    case MMCCommand::IORWExtended:
+    case MMCCommand::DataBlock:
+        break;
     }
 
     Log(LogLevel::Warn, "MMC: unknown CMD %d %08X\n", cmd, param);
@@ -1038,6 +1043,10 @@ void DSi_MMCStorage::SendACMD(MMCAppCommand cmd, u32 param)
         Host->SendResponse(CSR, true);
         Host->DataRX(SCR, 8);
         return;
+
+    case MMCAppCommand::GetWriteBlockCount:
+    case MMCAppCommand::SetWriteBlockCount:
+        break;
     }
 
     Log(LogLevel::Warn, "MMC: unknown ACMD %d %08X\n", cmd, param);
@@ -1061,6 +1070,9 @@ void DSi_MMCStorage::ContinueTransfer()
         RWCommand = MMCCommand::Reset;
     case MMCCommand::WriteMultipleBlocks:
         len = WriteBlock(RWAddress);
+        break;
+
+    default:
         break;
     }
 

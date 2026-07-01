@@ -162,7 +162,7 @@ protected:
     void focusInEvent(QFocusEvent* event) override;
     void focusOutEvent(QFocusEvent* event) override;
 
-    void showGame();
+    void showGame() override;
 
 signals:
     void screenLayoutChange();

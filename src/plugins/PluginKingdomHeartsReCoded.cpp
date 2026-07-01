@@ -2419,7 +2419,7 @@ ivec2 PluginKingdomHeartsReCoded::minimapCenter(bool zoomedIn, bool zoomedOut, i
                 }
 
                 if (valid) {
-                    possibilities.push_back(ivec4{x:x, y:y, z:6, w:6});
+                    possibilities.push_back(ivec4{.x = x, .y = y, .z = 6, .w = 6});
                 }
 
                 if (!valid) {
@@ -2434,7 +2434,7 @@ ivec2 PluginKingdomHeartsReCoded::minimapCenter(bool zoomedIn, bool zoomedOut, i
                     }
 
                     if (valid) {
-                        possibilities.push_back(ivec4{x:x, y:y, z:4, w:4});
+                        possibilities.push_back(ivec4{.x = x, .y = y, .z = 4, .w = 4});
                     }
 
                     if (!valid) {
@@ -2449,7 +2449,7 @@ ivec2 PluginKingdomHeartsReCoded::minimapCenter(bool zoomedIn, bool zoomedOut, i
                         }
 
                         if (valid) {
-                            possibilities.push_back(ivec4{x:x, y:y, z:3, w:5});
+                            possibilities.push_back(ivec4{.x = x, .y = y, .z = 3, .w = 5});
                         }
                     }
                 }
@@ -2459,7 +2459,7 @@ ivec2 PluginKingdomHeartsReCoded::minimapCenter(bool zoomedIn, bool zoomedOut, i
 
     int posSize = possibilities.size();
     if (posSize == 0) {
-        return ivec2{x:fallbackX, y:fallbackY};
+        return ivec2{.x = fallbackX, .y = fallbackY};
     }
 
     int x = 0;
@@ -2477,8 +2477,8 @@ ivec2 PluginKingdomHeartsReCoded::minimapCenter(bool zoomedIn, bool zoomedOut, i
         }
     }
     ivec2 result = {
-        x:std::max(std::min(x, maxX - distanceToCenter), minX + distanceToCenter),
-        y:std::max(std::min(y, maxY - distanceToCenter), minY + distanceToCenter)
+        .x = std::max(std::min(x, maxX - distanceToCenter), minX + distanceToCenter),
+        .y = std::max(std::min(y, maxY - distanceToCenter), minY + distanceToCenter)
     };
 
     return result;
