@@ -328,8 +328,33 @@ std::vector<std::string> ContentsOfFolder(const std::string& path, bool includeF
     return contents;
 }
 
+static LogLevel ParseLogLevelEnv()
+{
+    // Default to Warn: only warnings and errors print unless the user opts into more.
+    const char* env = std::getenv("MELON_MIX_LOG_LEVEL");
+    if (env == nullptr)
+        return LogLevel::Warn;
+
+    if (!strcasecmp(env, "Verbose")) return LogLevel::Verbose;
+    if (!strcasecmp(env, "Debug"))   return LogLevel::Debug;
+    if (!strcasecmp(env, "Info"))    return LogLevel::Info;
+    if (!strcasecmp(env, "Warn"))    return LogLevel::Warn;
+    if (!strcasecmp(env, "Error"))   return LogLevel::Error;
+
+    // Unrecognized value: fall back to the default rather than behaving unpredictably.
+    return LogLevel::Warn;
+}
+
 void Log(LogLevel level, const char* fmt, ...)
 {
+    // Read the threshold once (env vars don't change mid-process). A function-local static's
+    // initialization is thread-safe under C++11, which matters because Log() is called from
+    // several threads (EmuThread, the UI thread, audio callbacks).
+    static const LogLevel threshold = ParseLogLevelEnv();
+
+    if (level < threshold)
+        return;
+
     if (fmt == nullptr)
         return;
 
@@ -451,7 +476,7 @@ void WriteGBASave(const u8* savedata, u32 savelen, u32 writeoffset, u32 writelen
 void WriteFirmware(const Firmware& firmware, u32 writeoffset, u32 writelen, void* userdata)
 {
     EmuInstance* inst = (EmuInstance*)userdata;
-    printf("saving firmware for instance %d\n", inst->getInstanceID());
+    Log(LogLevel::Debug, "Saving firmware for instance %d\n", inst->getInstanceID());
     if (!inst->firmwareSave)
         return;
 

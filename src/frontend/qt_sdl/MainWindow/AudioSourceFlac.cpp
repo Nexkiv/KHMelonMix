@@ -1,6 +1,7 @@
 #include "AudioSourceFlac.h"
 #include <QFile>
 #include <QDebug>
+#include "Platform.h"
 
 #ifdef AUDIO_FLAC_ENABLED
 
@@ -16,12 +17,12 @@ AudioSourceFlac::~AudioSourceFlac() {
 
 bool AudioSourceFlac::open(QIODevice::OpenMode mode) {
     if (!m_fileLoaded) {
-        printf("Cannot open device: No FLAC file loaded\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: cannot open FLAC device — no file loaded\n");
         return false;
     }
     
     if ((mode & QIODevice::WriteOnly) != 0) {
-        printf("AudioSourceFlac is read-only\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: AudioSourceFlac is read-only, write ignored\n");
         return false;
     }
 
@@ -32,7 +33,7 @@ bool AudioSourceFlac::open(QIODevice::OpenMode mode) {
     m_lastDecodedSample = 0;
 
     if (!initializeDecoder()) {
-        printf("Failed to initialize FLAC decoder\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: failed to initialize FLAC decoder\n");
         return false;
     }
 
@@ -85,12 +86,12 @@ bool AudioSourceFlac::seekInternal(qint64 samplePos) {
 
     cleanupDecoder();
     if (!initializeDecoder()) {
-        printf("Failed to reinitialize decoder for seek\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: failed to reinitialize FLAC decoder for seek\n");
         return false;
     }
     
     if (!FLAC__stream_decoder_seek_absolute(m_decoder, samplePos)) {
-        printf("Failed to seek in FLAC file\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: failed to seek in FLAC file\n");
         return false;
     }
 
@@ -224,14 +225,14 @@ void AudioSourceFlac::errorCallback(
     void *clientData) {
     AudioSourceFlac* device = static_cast<AudioSourceFlac*>(clientData);
     if (device) {
-        printf("FLAC decoder error: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: FLAC decoder error: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
     }
 }
 
 FLAC__StreamDecoder* AudioSourceFlac::createNewDecoder() {
     FLAC__StreamDecoder* decoder = FLAC__stream_decoder_new();
     if (!decoder) {
-        printf("Failed to create FLAC decoder\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: failed to create FLAC decoder\n");
         return nullptr;
     }
 
@@ -246,13 +247,13 @@ FLAC__StreamDecoder* AudioSourceFlac::createNewDecoder() {
             this);
 
     if (initStatus != FLAC__STREAM_DECODER_INIT_STATUS_OK) {
-        printf("Failed to initialize FLAC decoder: %s\n", FLAC__StreamDecoderInitStatusString[initStatus]);
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: failed to initialize FLAC decoder: %s\n", FLAC__StreamDecoderInitStatusString[initStatus]);
         FLAC__stream_decoder_delete(decoder);
         return nullptr;
     }
 
     if (!FLAC__stream_decoder_process_until_end_of_metadata(decoder)) {
-        printf("Failed to process FLAC metadata\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: failed to process FLAC metadata\n");
         FLAC__stream_decoder_finish(decoder);
         FLAC__stream_decoder_delete(decoder);
         return nullptr;
@@ -284,7 +285,7 @@ bool AudioSourceFlac::decodeUntilFrame(qint64 targetSample) {
         
     while (m_lastDecodedSample < targetSample) {
         if (!FLAC__stream_decoder_process_single(m_decoder)) {
-            printf("Error processing FLAC frame\n");
+            melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: error processing FLAC frame\n");
             return false;
         }
         
@@ -307,7 +308,7 @@ void AudioSourceFlac::fillBuffer() {
     }
 
     if (FLAC__stream_decoder_get_state(m_decoder) == FLAC__STREAM_DECODER_END_OF_STREAM) {
-        printf("End of FLAC stream reached\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Debug, "Audio: end of FLAC stream reached\n");
     }
 }
 
@@ -320,11 +321,11 @@ qint64 AudioSourceFlac::readData(char* data, qint64 maxSize) {
 
     while (totalBytesRead < maxSize) {
         if (m_currentSample >= m_loopEndSample) {
-            printf("Looping back to sample:%lld (from:%lld)\n", m_loopStartSample, m_currentSample);
+            melonDS::Platform::Log(melonDS::Platform::LogLevel::Debug, "Audio: looping FLAC bgm back to sample %lld (from %lld)\n", m_loopStartSample, m_currentSample);
             m_loopsPlayed++;
 
             if (!seekInternal(m_loopStartSample)) {
-                printf("Failed to seek to loop start\n");
+                melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: failed to seek to FLAC loop start\n");
                 break;
             }
 

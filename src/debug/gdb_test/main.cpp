@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 #include "GdbStub.h"
@@ -111,8 +112,26 @@ int main(int argc, char** argv) {
 
 namespace Platform
 {
+static LogLevel ParseLogLevelEnv()
+{
+    const char* env = getenv("MELON_MIX_LOG_LEVEL");
+    if (env == nullptr) return LogLevel::Warn;
+
+    if (!strcasecmp(env, "Verbose")) return LogLevel::Verbose;
+    if (!strcasecmp(env, "Debug"))   return LogLevel::Debug;
+    if (!strcasecmp(env, "Info"))    return LogLevel::Info;
+    if (!strcasecmp(env, "Warn"))    return LogLevel::Warn;
+    if (!strcasecmp(env, "Error"))   return LogLevel::Error;
+
+    return LogLevel::Warn;
+}
+
 void Log(LogLevel level, const char* fmt, ...)
 {
+    static const LogLevel threshold = ParseLogLevelEnv();
+
+    if (level < threshold) return;
+
     if (fmt == nullptr) return;
 
     va_list args;

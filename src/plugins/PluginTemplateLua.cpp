@@ -25,28 +25,28 @@ static std::vector<u32> luaGameCodes;
 void addGameCode(u32 gameCode)
 {
     luaGameCodes.push_back(gameCode);
-    printf("Codes Size:%zu\n",luaGameCodes.size());
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: registered game code, %zu total\n", luaGameCodes.size());
 }
 
 void clearGameCodes()
 {
-    printf("Clearing Codes!\n");
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: clearing registered game codes\n");
     luaGameCodes.clear();
 }
 
 bool checkGameCodes(u32 gameCode)
 {
-    printf("Test: %i\n",gameCode);
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: checking game code 0x%08X\n", gameCode);
     if (luaGameCodes.size() == 0) {
-        printf("No Codes\n");
+        Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: no game codes registered\n");
         return false;
     }
     if (luaGameCodes[0] == 0xFFFFFFFF) {
-        printf("All Codes\n");
+        Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: wildcard game code registered, matching any game\n");
         return true; // GameCode "0xFFFFFFFF" means any game
     }
     bool found = std::find(std::begin(luaGameCodes), std::end(luaGameCodes), gameCode) != std::end(luaGameCodes);
-    printf("Found: %i\n",found);
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: game code match=%s\n", found ? "yes" : "no");
     return found;
 }
 
@@ -77,7 +77,7 @@ int Set2DShapes(std::vector<int> shapes){
             Current2DShapes.push_back(_2DShapeBuffer[index]);
         } else {
             Current2DShapes.clear();
-            printf("2DShape Index not found..."); // This can happen if the lua script uses an invalid index by mistake 
+            Platform::Log(Platform::LogLevel::Warn, "PluginTemplateLua: 2D shape index %d not found in buffer (invalid index from Lua script?)\n", index); // This can happen if the lua script uses an invalid index by mistake
             //TODO: throw error to LUA console...
             return -1;
         }
@@ -99,7 +99,7 @@ int Set3DShapes(std::vector<int> shapes){
             Current3DShapes.push_back(_3DShapeBuffer[index]);
         } else {
             Current3DShapes.clear();
-            printf("3DShape Index not found..."); // This can happen if the lua script uses an invalid index by mistake 
+            Platform::Log(Platform::LogLevel::Warn, "PluginTemplateLua: 3D shape index %d not found in buffer (invalid index from Lua script?)\n", index); // This can happen if the lua script uses an invalid index by mistake
             //TODO: throw error to LUA console...
             return -1;
         }
@@ -146,7 +146,7 @@ int run_ShapeBuilderTests(){
     std::vector<ShapeData2D> shapes;
     std::vector<ShapeData3D> shapes3D;
     int allGood = 1;
-    printf("Starting 2D Shape Test.\n");
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: starting 2D shape builder test\n");
     //Test each method in sequence
     shapes.push_back(ShapeBuilder2D::square()
             .fromBottomScreen()
@@ -278,7 +278,7 @@ int run_ShapeBuilderTests(){
 
     for (int i = 0; i<shapes.size();i++){
         if (i>=_2DShapeBuffer.size()){
-            printf("Ran out of 2DShapes in buffer at test number %i\n",i);
+            Platform::Log(Platform::LogLevel::Warn, "PluginTemplateLua: ran out of 2D shapes in buffer at test number %i\n", i);
             allGood = -1;
             break;
         }
@@ -286,11 +286,11 @@ int run_ShapeBuilderTests(){
         ShapeData2D luaShape = _2DShapeBuffer[i];
         int cmpr = memcmp(&cppShape, &luaShape, sizeof(ShapeData2D));
         if (cmpr!=0){
-            printf("2DShapeBuilder Test number %i failed...\n",i);
+            Platform::Log(Platform::LogLevel::Warn, "PluginTemplateLua: 2D shape builder test number %i failed\n", i);
             allGood = -1;
         }
     }
-    printf("Starting 3D Shape Test.\n");
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: starting 3D shape builder test\n");
     //Test each method in sequence        
     shapes3D.push_back(ShapeBuilder3D::square()
             .polygonAttributes(1058996416)
@@ -404,12 +404,12 @@ int run_ShapeBuilderTests(){
             .hudScale(hudScale)
             .build(aspectRatio));
     
-    printf("aspectRatio%f\n",aspectRatio);
-    printf("aspectRatio*aspectRatio%f\n",aspectRatio*aspectRatio);
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: aspectRatio=%f\n", aspectRatio);
+    Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: aspectRatio*aspectRatio=%f\n", aspectRatio*aspectRatio);
     
     for (int i = 0; i<shapes3D.size();i++){
         if (i>=_3DShapeBuffer.size()){
-            printf("Ran out of 3DShapes in buffer at test number %i\n",i);
+            Platform::Log(Platform::LogLevel::Warn, "PluginTemplateLua: ran out of 3D shapes in buffer at test number %i\n", i);
             allGood = -1;
             break;
         }
@@ -417,12 +417,12 @@ int run_ShapeBuilderTests(){
         ShapeData3D luaShape = _3DShapeBuffer[i];
         int cmpr = memcmp(&cppShape, &luaShape, sizeof(ShapeData3D));
         if (cmpr!=0){
-            printf("3DShapeBuilder Test number %i failed...\n",i);
+            Platform::Log(Platform::LogLevel::Warn, "PluginTemplateLua: 3D shape builder test number %i failed\n", i);
             allGood = -1;
         }
     }
     if (allGood == 1){
-        printf("All 2D/3D ShapeBuilder Test passed!\n");
+        Platform::Log(Platform::LogLevel::Debug, "PluginTemplateLua: all 2D/3D shape builder tests passed\n");
     }
     return allGood;
 }

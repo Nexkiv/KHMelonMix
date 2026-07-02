@@ -326,7 +326,7 @@
        </widget>
        <widget class="QFrame" name="settingWidgetOptionsGamepad"/>
        <widget class="QFrame" name="settingWidgetOptionsGeneral">
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="comboBoxGeneral">
          <property name="geometry">
           <rect>
            <x>50</x>
@@ -377,7 +377,7 @@
           </property>
          </item>
         </widget>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="labelGeneral2">
          <property name="geometry">
           <rect>
            <x>40</x>

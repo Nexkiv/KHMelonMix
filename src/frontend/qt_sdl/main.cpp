@@ -318,15 +318,15 @@ int main(int argc, char** argv)
 
     if (SDL_Init(SDL_INIT_HAPTIC) < 0)
     {
-        printf("SDL couldn't init rumble\n");
+        Platform::Log(Platform::LogLevel::Warn, "SDL couldn't init rumble: %s\n", SDL_GetError());
     }
     if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
     {
-        printf("SDL couldn't init joystick\n");
+        Platform::Log(Platform::LogLevel::Warn, "SDL couldn't init joystick: %s\n", SDL_GetError());
     }
     if (SDL_Init(SDL_INIT_SENSOR) < 0)
     {
-        printf("SDL couldn't init motion sensors\n");
+        Platform::Log(Platform::LogLevel::Warn, "SDL couldn't init motion sensors: %s\n", SDL_GetError());
     }
     if (SDL_Init(SDL_INIT_AUDIO) < 0)
     {
@@ -396,7 +396,7 @@ int main(int argc, char** argv)
         const QStringList dsfile = prepareRomPath(options->dsRomPath, options->dsRomArchivePath);
         const QStringList gbafile = prepareRomPath(options->gbaRomPath, options->gbaRomArchivePath);
 
-        if (memberSyntaxUsed) printf("Warning: use the a.zip|b.nds format at your own risk!\n");
+        if (memberSyntaxUsed) Platform::Log(Platform::LogLevel::Warn, "Use the a.zip|b.nds format at your own risk!\n");
 
         win->preloadROMs(dsfile, gbafile, options->boot);
 

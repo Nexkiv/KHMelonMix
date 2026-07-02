@@ -5,6 +5,8 @@
 #include <cstring>
 #include <algorithm>
 
+#include "Platform.h"
+
 namespace melonMix {
 
 struct WavHeader
@@ -34,7 +36,7 @@ bool AudioWavParser::readCuePoints(const std::string& filePath)
 {
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open()) {
-        printf("Error: Could not open file: %s\n", filePath.c_str());
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: could not open WAV file \"%s\"\n", filePath.c_str());
         return false;
     }
 
@@ -42,7 +44,7 @@ bool AudioWavParser::readCuePoints(const std::string& filePath)
     file.read(reinterpret_cast<char*>(&header), sizeof(header));
 
     if (std::strncmp(header.riff, "RIFF", 4) != 0 || std::strncmp(header.wave, "WAVE", 4) != 0) {
-        printf("Error: Not a valid WAV file: %s\n", filePath.c_str());
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "Audio: not a valid WAV file \"%s\"\n", filePath.c_str());
         return false;
     }
     

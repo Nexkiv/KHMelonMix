@@ -255,7 +255,7 @@ void EmuThread::run()
                 }
                 emuInstance->inputLoadConfig();
 
-                printf("Loading plugin %s for game code %u\n", typeid(*emuInstance->plugin).name(), gamecode);
+                Platform::Log(Platform::LogLevel::Info, "Loading plugin %s for game code %u\n", typeid(*emuInstance->plugin).name(), gamecode);
             }
 
             emuInstance->plugin->applyTouchKeyMaskToTouchControls(&emuInstance->touchX,

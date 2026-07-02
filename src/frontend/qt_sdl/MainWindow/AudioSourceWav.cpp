@@ -1,5 +1,6 @@
 #include "AudioSourceWav.h"
 #include "AudioWavParser.h"
+#include "Platform.h"
 
 namespace melonMix {
 
@@ -88,11 +89,11 @@ qint64 AudioSourceWav::readData(char *data, qint64 maxSize) {
         bytesRead = m_file.read(data, bytesBeforeLoop);
         
         if (bytesRead != bytesBeforeLoop) {
-            printf("Error or end of file\n");
+            melonDS::Platform::Log(melonDS::Platform::LogLevel::Warn, "Audio: WAV read fell short of loop point (truncated file?)\n");
             return bytesRead;
         }
 
-        printf("Loop bgm to start sample: %lld\n", m_loopStartByte);
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Debug, "Audio: looping WAV bgm back to start sample %lld\n", m_loopStartByte);
         m_loopsPlayed++;
 
         m_file.seek(m_loopStartByte);

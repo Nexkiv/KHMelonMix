@@ -79,7 +79,10 @@ if (ENABLE_LTO)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-if (NOT APPLE)
+# -s (strip symbols) is a GNU-ld/binutils linker flag. It works on Linux/BSD, but on the
+# Windows clang toolchain it reaches the compile driver and is reported as an unused argument
+# (clang++: "argument unused during compilation: '-s'"), so exclude Windows where it does nothing.
+if (NOT APPLE AND NOT WIN32)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
 endif()
 

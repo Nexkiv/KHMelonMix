@@ -794,7 +794,10 @@ bool Load()
     }
 
     if (!Platform::CheckFileWritable(cfgpath))
+    {
+        Platform::Log(Platform::LogLevel::Error, "Config: cannot read/write config file \"%s\" — settings will not persist this session\n", cfgpath.c_str());
         return false;
+    }
 
     RootTable = toml::value();
 
@@ -807,6 +810,7 @@ bool Load()
     }
     catch (toml::syntax_error& err)
     {
+        Platform::Log(Platform::LogLevel::Error, "Config: syntax error in config file \"%s\", falling back to defaults: %s\n", cfgpath.c_str(), err.what());
         //RootTable = toml::table();
     }
 
@@ -826,7 +830,10 @@ void Save()
     }
 
     if (!Platform::CheckFileWritable(cfgpath))
+    {
+        Platform::Log(Platform::LogLevel::Error, "Config: cannot write config file \"%s\" — settings changes will be lost\n", cfgpath.c_str());
         return;
+    }
 
     std::ofstream file;
     file.open(std::filesystem::u8path(cfgpath), std::ofstream::out | std::ofstream::trunc);

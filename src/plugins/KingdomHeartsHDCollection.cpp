@@ -223,7 +223,7 @@ KingdomHeartsHDCollection::KHMareConfig* KingdomHeartsHDCollection::config()
     std::filesystem::path configFilePath = _configFolderPath / "config1525.dat";
     Platform::FileHandle* configFileHandle = Platform::OpenFile(configFilePath.string(), Platform::FileMode::ReadText);
 
-    printf("Config file path: %s\n", configFilePath.string().c_str());
+    Platform::Log(Platform::LogLevel::Debug, "KHHDCollection: loading config file \"%s\"\n", configFilePath.string().c_str());
 
     auto* config = new KHMareConfig();
     Platform::FileRead(config, sizeof(KHMareConfig), 1, configFileHandle);

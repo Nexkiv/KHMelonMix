@@ -112,8 +112,8 @@ std::filesystem::path Plugin::gameAssetsFolderPath()
         try {
             std::filesystem::create_directory(assetsPath);
         }
-        catch (const std::runtime_error& ignored) {
-            printf("Failed to create assets folder. Replacement assets are unavailable");
+        catch (const std::runtime_error& err) {
+            Platform::Log(Platform::LogLevel::Error, "Plugin: failed to create assets folder \"%s\": %s — replacement assets are unavailable\n", assetsPath.string().c_str(), err.what());
         }
     }
 
@@ -191,7 +191,7 @@ bool Plugin::gpuOpenGL_applyChangesToPolygonVertex(int resolutionScale, s32 scal
     vec3 newValues = shape.compute3DCoordinatesOf3DSquareShapeInVertexMode(_x, _y, _z, xCenter, yCenter, polygon->Attr, polygon->TexParam, rgb, resolutionScale, aspectRatio);
     if (newValues.z == 1) {
         if (loggerModeEnabled) {
-            printf("Old Position: %f - %f -- Attribute: %d -- New Position: %f - %f\n", _x, _y, polygon->Attr, newValues.x, newValues.y);
+            Platform::Log(Platform::LogLevel::Verbose, "Plugin: 3D shape vertex remap — old=(%f, %f) attr=%d new=(%f, %f)\n", _x, _y, polygon->Attr, newValues.x, newValues.y);
         }
 
         *x = (s32)(newValues.x);
@@ -239,7 +239,7 @@ bool Plugin::gpuOpenGL_applyChangesToPolygon(int resolutionScale, s32 scaledPosi
                         {
                             if (loggerModeEnabled) {
                                 atLeastOneLog = true;
-                                printf("Position: %d - %d -- Size: %d - %d - New vertexes: %d\n", x0, y0, x1 - x0, y1 - y0, polygon->NumVertices);
+                                Platform::Log(Platform::LogLevel::Verbose, "Plugin: 3D shape polygon match — pos=(%d, %d) size=(%d, %d) vertices=%d\n", x0, y0, x1 - x0, y1 - y0, polygon->NumVertices);
                             }
 
                             float xCenter = (x0 + x1)/2.0;
@@ -259,7 +259,7 @@ bool Plugin::gpuOpenGL_applyChangesToPolygon(int resolutionScale, s32 scaledPosi
                             }
 
                             if (atLeastOneLog) {
-                                printf("\n");
+                                Platform::Log(Platform::LogLevel::Verbose, "\n");
                             }
 
                             return true;
@@ -290,7 +290,7 @@ bool Plugin::gpuOpenGL_applyChangesToPolygon(int resolutionScale, s32 scaledPosi
         }
     }
     if (atLeastOneLog) {
-        printf("\n");
+        Platform::Log(Platform::LogLevel::Verbose, "\n");
     }
 
     return changed;
@@ -854,7 +854,7 @@ void Plugin::onIngameCutsceneIdentified(CutsceneEntry* cutscene) {
         return;
     }
 
-    printf("Preparing to load cutscene: %s\n", cutscene->Name);
+    Platform::Log(Platform::LogLevel::Debug, "Cutscene: preparing to load \"%s\"\n", cutscene->Name);
 
     _CanSkipHdCutscene = true;
     _CurrentCutscene = cutscene;
@@ -866,7 +866,7 @@ void Plugin::onTerminateIngameCutscene() {
     if (_CurrentCutscene == nullptr) {
         return;
     }
-    printf("Ingame cutscene terminated\n");
+    Platform::Log(Platform::LogLevel::Debug, "Cutscene: in-game cutscene terminated\n");
     _ShouldTerminateIngameCutscene = false;
     _StoppedIngameCutscene = true;
 
@@ -875,14 +875,14 @@ void Plugin::onTerminateIngameCutscene() {
     }
 }
 void Plugin::onReplacementCutsceneStarted() {
-    printf("Cutscene started\n");
+    Platform::Log(Platform::LogLevel::Debug, "Cutscene: replacement cutscene started\n");
     _ShouldStartReplacementCutscene = false;
     _StartedReplacementCutscene = true;
     _RunningReplacementCutscene = true;
 }
 
 void Plugin::onReplacementCutsceneEnd() {
-    printf("Replacement cutscene ended\n");
+    Platform::Log(Platform::LogLevel::Debug, "Cutscene: replacement cutscene ended\n");
     _StartedReplacementCutscene = false;
     _RunningReplacementCutscene = false;
     _ShouldStopReplacementCutscene = false;
@@ -899,7 +899,7 @@ void Plugin::onReplacementCutsceneEnd() {
     _ShouldPauseCutsceneEmulation = false; // returning to game already resumes the emulator
 }
 void Plugin::onReturnToGameAfterCutscene() {
-    printf("Returning to the game\n");
+    Platform::Log(Platform::LogLevel::Debug, "Cutscene: returning to the game\n");
     _StartPressCount = 0;
     _IsUnskippableCutscene = false;
     _ShouldStartReplacementCutscene = false;
@@ -1405,6 +1405,9 @@ void Plugin::ramSearch(melonDS::NDS* nds, u32 HotkeyPress) {
 #if !RAM_SEARCH_ENABLED
     return;
 #endif
+    // This is a developer memory-scanner tool (Cheat Engine style): the printed addresses/values
+    // ARE its output, not status logging, so these stay on raw printf rather than going through
+    // Log()'s level filter — a developer triggering a search wants the results unconditionally.
 
     int byteSize = RAM_SEARCH_SIZE/8;
     u32 limitMin = RAM_SEARCH_LIMIT_MIN;

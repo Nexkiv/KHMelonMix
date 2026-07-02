@@ -86,7 +86,7 @@ void MainWindowSettings::asyncStartBgmMusic(quint16 bgmId, quint8 volume, bool b
         timer->setInterval(delayFromMovieStart);
         timer->setSingleShot(true);
 
-        printf("Delay to start replacement song %d (%dms)\n", bgmId, delayFromMovieStart);
+        Platform::Log(Platform::LogLevel::Debug, "Audio: delaying start of replacement song %d by %dms\n", bgmId, delayFromMovieStart);
 
         QObject::connect(timer, &QTimer::timeout, [this, bgmId, volume, bResumePos, bgmMusicFilePath](){
             QMetaObject::invokeMethod(this, "startBgmMusic", Qt::QueuedConnection,
@@ -122,9 +122,9 @@ void MainWindowSettings::startBgmMusic(quint16 bgmId, quint8 volume, bool bResum
     qreal initialVolume = getBgmMusicVolume(volume);
     bgmPlayer->play(startPosition, initialVolume, fadeIn);
     if (bResumePos) {
-        printf("Starting replacement song %d (Resumed with fadein at pos %lld) volume: %.3f\n", bgmId, startPosition, initialVolume);
+        Platform::Log(Platform::LogLevel::Debug, "Audio: starting replacement song %d (resumed with fade-in at pos %lld) volume=%.3f\n", bgmId, startPosition, initialVolume);
     } else {
-        printf("Starting replacement song %d volume: %.3f\n", bgmId, initialVolume);
+        Platform::Log(Platform::LogLevel::Debug, "Audio: starting replacement song %d volume=%.3f\n", bgmId, initialVolume);
     }
 
     bgmPlayers.append(bgmPlayer);
@@ -178,7 +178,7 @@ void MainWindowSettings::stopBgmMusic(quint16 bgmId, bool bStoreResumePos, quint
 
     for(auto* player : bgmPlayers) {
         if (player->getBgmId() == bgmId && player->isPlaying()) {
-            printf("Stopping replacement song %d with %dms fadeout\n", bgmId, fadeOutDuration);
+            Platform::Log(Platform::LogLevel::Debug, "Audio: stopping replacement song %d with %dms fade-out\n", bgmId, fadeOutDuration);
             player->stop(fadeOutDuration);
 
             if (bStoreResumePos) {
@@ -196,7 +196,7 @@ void MainWindowSettings::asyncPauseBgmMusic()
 
 void MainWindowSettings::pauseBgmMusic()
 {
-    printf("Pausing bgm music\n");
+    Platform::Log(Platform::LogLevel::Debug, "Audio: pausing replacement bgm\n");
 
     for(auto* player : bgmPlayers) {
         player->pause();
@@ -210,7 +210,7 @@ void MainWindowSettings::asyncUnpauseBgmMusic()
 
 void MainWindowSettings::unpauseBgmMusic()
 {
-    printf("Resuming bgm music\n");
+    Platform::Log(Platform::LogLevel::Debug, "Audio: resuming replacement bgm\n");
 
     for(auto* player : bgmPlayers) {
         player->resume();
@@ -224,7 +224,7 @@ void MainWindowSettings::asyncStopAllBgm()
 
 void MainWindowSettings::stopAllBgm()
 {
-    printf("Stop all bgm\n");
+    Platform::Log(Platform::LogLevel::Debug, "Audio: stopping all replacement bgm\n");
 
     for(auto* player : bgmPlayers) {
         player->stop(0);
@@ -265,7 +265,23 @@ void MainWindowSettings::onBgmFadeOutCompleted(melonMix::AudioPlayer* playerStop
             it++;
         }
     }
-    printf("BGM players remaining after cleanup: %d\n", (int)bgmPlayers.size());
+    Platform::Log(Platform::LogLevel::Debug, "Audio: %d BGM player(s) remaining after cleanup\n", (int)bgmPlayers.size());
+}
+
+static const char* mediaStatusName(QMediaPlayer::MediaStatus status)
+{
+    switch (status)
+    {
+    case QMediaPlayer::NoMedia:        return "NoMedia";
+    case QMediaPlayer::LoadingMedia:   return "LoadingMedia";
+    case QMediaPlayer::LoadedMedia:    return "LoadedMedia";
+    case QMediaPlayer::StalledMedia:   return "StalledMedia";
+    case QMediaPlayer::BufferingMedia: return "BufferingMedia";
+    case QMediaPlayer::BufferedMedia:  return "BufferedMedia";
+    case QMediaPlayer::EndOfMedia:     return "EndOfMedia";
+    case QMediaPlayer::InvalidMedia:   return "InvalidMedia";
+    default:                           return "Unknown";
+    }
 }
 
 void MainWindowSettings::createVideoPlayer()
@@ -275,7 +291,7 @@ void MainWindowSettings::createVideoPlayer()
     centralWidget->addWidget(playerView);
 
     connect(player.get(), &QMediaPlayer::mediaStatusChanged, [=](QMediaPlayer::MediaStatus status) {
-        printf("======= MediaStatus: %d\n", status);
+        Platform::Log(Platform::LogLevel::Debug, "Audio: cutscene video media status changed to %s\n", mediaStatusName(status));
 
         if (status == QMediaPlayer::BufferingMedia || status == QMediaPlayer::BufferedMedia) {
             emuInstance->plugin->onReplacementCutsceneStarted();

@@ -31,12 +31,12 @@ void SSEQMuter::parseSequenceHeader() {
     // Caution: in Days, there is no track 27! Meaning that every song starting from 28 needs to be "-1" to get the correct address
     // (otherwise you'll just get a nullptr entry in the table). See call to getSongIdInSongTable().
     if (m_songAddress == 0) {
-        printf("Error: SSEQ %d is not loaded!!!\n", m_bgmId);
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "AudioUtils: SSEQ %d is not loaded\n", m_bgmId);
         return;
     }
 
     if (m_songSize == 0) {
-        printf("Error: Invalid SSEQ size for %d\n", m_bgmId);
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "AudioUtils: invalid SSEQ size (0) for bgm %d\n", m_bgmId);
         return;
     }
 
@@ -45,23 +45,23 @@ void SSEQMuter::parseSequenceHeader() {
     u32 sseqFileSize = nds->ARM9Read32(m_songAddress + 8);
 
     if (sseqTag != 0x51455353) { // SSEQ
-        printf("Error: Invalid SSEQ: incorrect header tag\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "AudioUtils: invalid SSEQ for bgm %d: incorrect header tag\n", m_bgmId);
         return;
     }
 
     if (sseqMagic != 0x0100feff) {
-        printf("Error: Invalid SSEQ: incorrect magic number\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "AudioUtils: invalid SSEQ for bgm %d: incorrect magic number\n", m_bgmId);
         return;
     }
 
     if (sseqFileSize != m_songSize) {
-        printf("Error: Invalid SSEQ: incorrect file size\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "AudioUtils: invalid SSEQ for bgm %d: file size mismatch\n", m_bgmId);
         return;
     }
 
     u32 dataHdrTag = nds->ARM9Read32(m_songAddress + 0x10);
     if (dataHdrTag != 0x41544144) { // "DATA"
-        printf("Error: Invalid SSEQ: incorrect DATA header tag\n");
+        melonDS::Platform::Log(melonDS::Platform::LogLevel::Error, "AudioUtils: invalid SSEQ for bgm %d: incorrect DATA header tag\n", m_bgmId);
         return;
     }
 

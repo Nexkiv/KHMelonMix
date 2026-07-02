@@ -3204,16 +3204,8 @@ void PluginKingdomHeartsReCoded::debugLogs(int gameScene)
     // PRINT_AS_32_BIT_HEX(0x020b7db8);
     // printf("\n");
 
-    if (!DEBUG_MODE_ENABLED) {
-        return;
-    }
-
-    printf("Game scene: %d\n", GameScene);
-    printf("Game scene state: %d\n", GameSceneState);
-    printf("Current map: %d\n", getCurrentMap());
-    printf("Current main menu view: %d\n", getCurrentMainMenuView());
-    printf("Is save loaded: %d\n", isSaveLoaded() ? 1 : 0);
-    printf("\n");
+    Platform::Log(Platform::LogLevel::Verbose, "KHReCoded: game scene=%d, scene state=%d, map=%d, main menu view=%d, save loaded=%s\n",
+        GameScene, GameSceneState, getCurrentMap(), getCurrentMainMenuView(), isSaveLoaded() ? "yes" : "no");
 }
 
 }

@@ -85,12 +85,12 @@ jobs:
     - name: Build the AppImage
       env:
         EXTRA_PLATFORM_PLUGINS: libqwayland-egl.so;libqwayland-generic.so
-        EXTRA_QT_PLUGINS: waylandcompositor
+        EXTRA_QT_MODULES: waylandcompositor
         QMAKE: /usr/lib/qt6/bin/qmake
       run: |
         ./linuxdeploy-${{ matrix.arch.name }}.AppImage --list-plugins
-        ./linuxdeploy-${{ matrix.arch.name }}.AppImage --appdir AppDir --plugin qt
-        ./linuxdeploy-${{ matrix.arch.name }}.AppImage --appdir AppDir --plugin gstreamer --output appimage
+        ./linuxdeploy-${{ matrix.arch.name }}.AppImage --appdir AppDir --desktop-file AppDir/usr/share/applications/com.vitormm.MelonMix.desktop --plugin qt
+        ./linuxdeploy-${{ matrix.arch.name }}.AppImage --appdir AppDir --desktop-file AppDir/usr/share/applications/com.vitormm.MelonMix.desktop --plugin gstreamer --output appimage
     - name: Preparing artifacts (appimage-x86_64)
       if: matrix.arch.name != 'aarch64'
       run: |

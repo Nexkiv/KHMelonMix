@@ -241,8 +241,18 @@ u64 FileLength(FileHandle* file);
 
 std::vector<std::string> ContentsOfFolder(const std::string& path, bool includeFolders, bool includeFiles);
 
+// Ordered by ascending severity. The frontend's Log() (Platform.cpp) suppresses any message
+// below the MELON_MIX_LOG_LEVEL threshold (default: Warn), so the console stays quiet unless
+// something is worth looking into. Set MELON_MIX_LOG_LEVEL=Verbose/Debug/Info/Warn/Error to
+// widen or narrow the output; Verbose unlocks high-frequency per-frame diagnostics.
+//
+// Known grey area: many Warn/Error messages in the core emulator (src/, outside frontend/ and
+// plugins/) originate from upstream melonDS and can be crudely worded or terse. Those are left
+// as-is to keep upstream merges low-friction; the filtering here reduces their volume but does
+// not reword them.
 enum LogLevel
 {
+    Verbose,
     Debug,
     Info,
     Warn,
